@@ -252,7 +252,7 @@ views.py에 success_url = reverse_lazy('accounts:signin') 과 연관되어 있�
 
 {% bootstrap_form form %} 에 담겨서 전달하나?
 
-tttttt
+tttttt32sfsafd
 
 앱(, data, review, user_profile)
 
