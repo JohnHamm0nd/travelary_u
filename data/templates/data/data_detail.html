@@ -1,0 +1,401 @@
+{%extends 'base.html'%}
+{%block body%}
+{%load staticfiles%}
+
+
+<!--지도O--><!--검색페이지사진, 상세정보-->
+
+<style>
+#container {overflow:hidden;height:100%;position:relative;}
+#btnRoadview,  #btnMap {position:absolute;top:5px;left:5px;padding:7px 12px;font-size:14px;border: 1px solid #dbdbdb;background-color: #fff;border-radius: 2px;box-shadow: 0 1px 1px rgba(0,0,0,.04);z-index:1;cursor:pointer;}
+#btnRoadview:hover,  #btnMap:hover{background-color: #fcfcfc;border: 1px solid #c1c1c1;}
+#container.view_map #mapWrapper {z-index: 10;}
+#container.view_map #btnMap {display: none;}
+#container.view_roadview #mapWrapper {z-index: 0;}
+#container.view_roadview #btnRoadview {display: none;}
+</style>
+
+
+<div class="container">
+
+<div class="row">
+	<div id="container" class="view_map col-md-8 col-sm-12" style="height:600px;padding-right:0px;padding-left:0px;">
+        <!--<div id="mapWrapper" style="width:780px;height:600px;position:relative;">-->
+        <div id="mapWrapper" style="width:100%;height:100%;position:relative;">
+            <div id="map" style="width:100%;height:100%"></div> <!-- 지도를 표시할 div 입니다 -->
+            <input type="button" id="btnRoadview" onclick="toggleMap(false)" title="로드뷰 보기" value="로드뷰">
+        </div>
+        <!--<div id="rvWrapper" style="width:780px;height:600px;position:absolute;top:0;left:0;">-->
+        <div id="rvWrapper" style="width:100%;height:100%;position:absolute;top:0;left:0;">
+            <div id="roadview" style="width:100%;height:100%"></div> <!-- 로드뷰를 표시할 div 입니다 -->
+            <input type="button" id="btnMap" onclick="toggleMap(true)" title="지도 보기" value="지도">
+        </div>
+    </div>
+    <div class=" col-md-4 col-sm-12">
+		<div class="single-explore-item">
+			<div class="single-explore-img" data-toggle="modal" data-target="#myModal_{{data.imageSrc}}" style="cursor:pointer;"> <!-- 모달(작동안함, 수정 필요) -->
+				{% if data.imageSrc %}
+					<img src="{{data.imageSrc}}" alt="explore image" class="explore-img img-fluid">
+				{% else %}
+					<img src="https://previews.123rf.com/images/aquir/aquir1405/aquir140500246/28667314-binnenkort-rood-round-grungy-stempel-ge%C3%AFsoleerd-op-een-witte-achtergrond.jpg" alt="explore image" class="explore-img">
+				{% endif %}
+				<div class="single-explore-img-info">
+					<button onclick="window.location.href='#'">best rated</button>
+					<div class="single-explore-image-icon-box">
+						<ul>
+							<li>
+								<div class="single-explore-image-icon">
+									<i class="fa fa-arrows-alt"></i>
+								</div>
+							</li>
+							<li>
+								<div class="single-explore-image-icon">
+									<i class="fa fa-bookmark-o"></i>
+								</div>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+			<div class="single-explore-txt bg-theme-1">
+				<h2><a href="{% url 'data:detail' data.id %}">{{data.name}}</a></h2>
+				<p class="explore-rating-price">
+					<span class="explore-rating">5.0</span>
+					<a href="#"> 10 ratings</a> 
+					<span class="explore-price-box">
+						form
+						<span class="explore-price">{{data.commonAddr}}</span>
+					</span>
+				<div class="explore-person">
+					<div class="row">
+						<div class="col-sm-2">
+							<div class="explore-person-img">
+								<!--<a href="#">-->
+								<!--	<img src="{% static '/images/explore/person.png' %}" alt="explore person">-->
+								</a>
+							</div>
+						</div>
+						<div class="col-sm-10" style="height:100px;overflow: hidden;">
+							<p>{{data.desc}}</p>
+							<p>{{data.tags}}</p>
+							<p>{{data.options}}</p>
+							<p>{{data.commonAddr}} {{data.addr}}</p>
+							<p>{{data.phone}}</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+<!--리뷰작성-->
+	
+{% if user.is_authenticated %}
+	<a href="{% url 'data:reviewcreate' data_id=data.id user_id=user.id %}" class="btn btn-primary btn-lg" style="float:right;float:right;margin-right:30px">Review</a>
+{% endif %}
+{%if user in timetable.wish.all %}
+	<button id="wish" class="btn btn-primary btn-lg" name="{{wish.id}}" style="float:right;margin-right:30px"> <i id="heart" class="fas fa-heart"><span id="wish_count" class="badge badge-light">{{timetable.wish.count}}</span> </i> 담기</button>
+{%else%}
+	<button id="wish" class="btn btn-primary btn-lg" name="{{wish.id}}" style="float:right;float:right;margin-right:30px"> <i id="heart" class="far fa-heart"><span id="wish_count" class="badge badge-light">{{timetable.wish.count}}</span></i> 담기</button>
+{%endif%}
+
+</div>
+</div>
+
+
+
+<!--사용자 리뷰들 클릭-(모달)사진(여러장)|리뷰보기-->
+
+<section id="explore" class="explore">
+	<div class="container">
+		<div class="section-header">
+	    </div>
+	    <div class="explore-content">
+			<div class="row">
+				{% for review in data.review_set.all %}
+					<div class=" col-md-4 col-sm-6">
+						<div class="single-explore-item">
+							<div class="single-explore-img" data-toggle="modal" data-target="#myModal_{{review.id}}" style="cursor:pointer;">
+								{% if review.image_set.first %}
+									<img src="/media/{{ review.image_set.first.image }}" alt="explore image" class="explore-img">
+								{% else %}
+									<img src="https://previews.123rf.com/images/aquir/aquir1405/aquir140500246/28667314-binnenkort-rood-round-grungy-stempel-ge%C3%AFsoleerd-op-een-witte-achtergrond.jpg" class="explore-img">
+								{% endif %}
+									<div class="single-explore-img-info">
+										<button onclick="window.location.href='#'">best rated
+										</button>
+											<div class="single-explore-image-icon-box">
+												<ul>
+													<li>
+														<div class="single-explore-image-icon">
+															<i class="fa fa-arrows-alt"></i>
+														</div>
+													</li>
+													<li>
+														<div class="single-explore-image-icon">
+															<i class="fa fa-bookmark-o"></i>
+														</div>
+													</li>
+												</ul>
+											</div>
+									</div>
+							</div>
+							<div class="single-explore-txt bg-theme-1">
+								<h2><a href="{% url 'data:detail' data.id %}">{{data.name}}</a></h2>
+								<p class="explore-rating-price">
+								<span class="explore-rating">{{review.rate}}</span>
+								<a href="#"> 10 ratings</a> 
+								<span class="explore-price-box">
+									<!--form-->
+									<span class="explore-price">{{review.user}}</span>
+								</span>
+								<div class="explore-person">
+									<div class="row">
+										<div class="col-sm-2">
+											<div class="explore-person-img">
+												<a href="#">
+												{% if review.user.user_profile.image_profile %}
+													<img src="{{review.user.user_profile.image_profile.url}}" alt="explore person" class="img-circle img-responsive">
+												{% else %}
+													<img src="{% static '/images/explore/person.png' %}" alt="explore person">
+												{% endif %}
+												</a>
+											</div>
+										</div>
+										<div class="col-sm-10" style="height:100px;overflow: hidden;">
+											{{review.content|truncatechars:150}}
+										</div>
+									</div>
+								</div>
+							</div>
+								<!-- Button trigger modal -->
+								<!--<button class="btn btn-primary" data-toggle="modal" data-target="#myModal_{{review.id}}">-->
+								<!--	  Launch demo modal-->
+								<!--</button>-->
+									<!-- Modal -->
+									<div class="modal fade bs-example-modal-lg" id="myModal_{{review.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+										<div class="modal-dialog modal-lg">
+									    	<div class="modal-content">
+									      		<div class="modal-header">
+									        		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+									      				  <h4 class="modal-title" id="myModalLabel">
+									      				  		<img src="{{review.user.user_profile.image_profile.url}}" alt="explore person" class="img-circle" width="40px" style="margin-right: 12px;">{{review.user}}
+									      				  </h4>
+									      		</div>
+									      		<div class="modal-body">
+										    		<div class="row">
+          												<div class="col-sm-12">
+          													<div class="row">
+              													<div class="col-8 col-sm-8">	
+										    						<div id="carousel_{{review.id}}" class="carousel slide" data-ride="carousel" data-interval="false">
+																	 	<!-- Indicators -->
+																	 	<ol class="carousel-indicators">
+																	 		{% for i in review.image_set.all %}
+																	      		{% if forloop.counter0 == 0 %}
+																	    	<li data-target="#carousel_{{review.id}}" data-slide-to="{{ forloop.counter0 }}" class="active"></li>
+																		  		{% else %}
+																			<li data-target="#carousel_{{review.id}}" data-slide-to="{{ forloop.counter0 }}"></li>
+																		  		{% endif %}
+																	  		{% endfor %}
+																	  	</ol>
+
+																	  <!-- Wrapper for slides -->
+																	  	<div class="carousel-inner" role="listbox">
+																	  		{% if review.image_set.first.image %}
+																		  		{% for image in review.image_set.all %}
+																		  			{% if forloop.counter == 1 %}
+																	  					<div class="item active">
+															  						{% else %}
+								  									  						<div class="item">
+															  						{% endif %}
+																		  		<img src="{{image.image.url}}">
+																		 					</div>
+																		  		{% endfor %}
+																		  	{% else %}
+																		  		<img src="https://previews.123rf.com/images/aquir/aquir1405/aquir140500246/28667314-binnenkort-rood-round-grungy-stempel-ge%C3%AFsoleerd-op-een-witte-achtergrond.jpg">
+																		  	{% endif %}	
+																	  				</div>
+																		  <!-- Controls -->
+																		  	<a class="left carousel-control" href="#carousel_{{review.id}}" data-slide="prev">
+																		    <span class="glyphicon glyphicon-chevron-left"></span>
+																		  	</a>
+																		  	<a class="right carousel-control" href="#carousel_{{review.id}}" data-slide="next">
+																		    <span class="glyphicon glyphicon-chevron-right"></span>
+																		  	</a>
+																		</div>
+																		
+																	</div>
+								          							<div class="col-8 col-sm-4">
+								        								{{review.content|linebreaks }}
+				                  									</div>
+																</div>
+															</div>
+														</div>
+									     				<div class="modal-footer">
+												        <!--<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>-->
+												        <!--<button type="button" class="btn btn-primary">Save changes</button>-->
+								      					</div>
+								    				</div>
+								    			</div>
+							    			</div><!-- /.modal-content -->
+								  		</div><!-- /.modal-dialog -->
+									</div><!-- /.modal -->
+								</div>
+				{%endfor%}
+			</div>
+		</div>
+	</div>
+</section>
+
+
+
+
+
+
+
+
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=4a206359c7aca2dd23eaa8cc71f37fee"></script>
+<script>
+var container = document.getElementById('container'), // 지도와 로드뷰를 감싸고 있는 div 입니다
+    mapWrapper = document.getElementById('mapWrapper'), // 지도를 감싸고 있는 div 입니다
+    btnRoadview = document.getElementById('btnRoadview'), // 지도 위의 로드뷰 버튼, 클릭하면 지도는 감춰지고 로드뷰가 보입니다 
+    btnMap = document.getElementById('btnMap'), // 로드뷰 위의 지도 버튼, 클릭하면 로드뷰는 감춰지고 지도가 보입니다 
+    rvContainer = document.getElementById('roadview'), // 로드뷰를 표시할 div 입니다
+    mapContainer = document.getElementById('map'); // 지도를 표시할 div 입니다
+
+// 지도와 로드뷰 위에 마커로 표시할 특정 장소의 좌표입니다 
+var placePosition = new daum.maps.LatLng({{data.y}}, {{data.x}});
+
+// 지도 옵션입니다 
+var mapOption = {
+    center: placePosition, // 지도의 중심좌표 
+    level: 3 // 지도의 확대 레벨
+};
+
+// 지도를 표시할 div와 지도 옵션으로 지도를 생성합니다
+var map = new daum.maps.Map(mapContainer, mapOption);
+
+// 일반 지도와 스카이뷰로 지도 타입을 전환할 수 있는 지도타입 컨트롤을 생성합니다
+var mapTypeControl = new daum.maps.MapTypeControl();
+
+// 지도에 컨트롤을 추가해야 지도위에 표시됩니다
+// daum.maps.ControlPosition은 컨트롤이 표시될 위치를 정의하는데 TOPRIGHT는 오른쪽 위를 의미합니다
+map.addControl(mapTypeControl, daum.maps.ControlPosition.TOPRIGHT);
+
+// 지도 확대 축소를 제어할 수 있는  줌 컨트롤을 생성합니다
+var zoomControl = new daum.maps.ZoomControl();
+map.addControl(zoomControl, daum.maps.ControlPosition.RIGHT);
+
+// 로드뷰 객체를 생성합니다 
+var roadview = new daum.maps.Roadview(rvContainer);
+
+// 로드뷰의 위치를 특정 장소를 포함하는 파노라마 ID로 설정합니다
+// 로드뷰의 파노라마 ID는 Wizard를 사���하면 쉽게 얻을수 있습니다 
+// 특정 위치의 좌표와 가까운 로드뷰의 panoId를 추출하여 로드뷰를 띄운다.
+var roadviewClient = new daum.maps.RoadviewClient(); //좌표로부터 로드뷰 파노ID를 가져올 로드뷰 helper객체
+roadviewClient.getNearestPanoId(placePosition, 50, function(panoId) {
+    roadview.setPanoId(panoId, placePosition); //panoId와 중심좌표를 통해 로드뷰 실행
+});
+
+
+// 특정 장소가 잘보이도록 로드뷰의 적절한 시점(ViewPoint)을 설정합니다 
+// Wizard를 사용하면 적절한 로드뷰 시점(ViewPoint)값을 쉽게 확인할 수 있습니다
+roadview.setViewpoint({
+    pan: 321,
+    tilt: 0,
+    zoom: 0
+});
+
+// 지도 중심을 표시할 마커를 생성하고 특정 장소 위에 표시합니다 
+var mapMarker = new daum.maps.Marker({
+    position: placePosition,
+    map: map
+});
+
+
+
+// 로드뷰 초기화가 완료되면 
+daum.maps.event.addListener(roadview, 'init', function() {
+
+    // 로드뷰에 특정 장소를 표시할 마커를 생성하고 로드뷰 위에 표시합니다 
+    var rvMarker = new daum.maps.Marker({
+        position: placePosition,
+        map: roadview
+    });
+});
+
+// 지도와 로드뷰를 감싸고 있는 div의 class를 변경하여 지도를 숨기거나 보이게 하는 함수입니다 
+function toggleMap(active) {
+    if (active) {
+
+        // 지도가 보이도록 지도와 로드뷰를 감싸고 있는 div의 class를 변경합니다
+        container.className = "view_map col-md-8 col-sm-12"
+    } else {
+
+        // 지도가 숨겨지도록 지도와 로드뷰를 감싸고 있는 div의 class를 변경합니다
+        container.className = "view_roadview col-md-8 col-sm-12"   
+    }
+}
+
+
+// $(document).ready(function(){
+//     $('.openPopup').on('click',function(){
+//     	alert('실행됨!!!')
+//         var dataURL = $(this).attr('a href');
+//         $('.modal-body').load(dataURL,function(){
+//             $('#myModal').modal({show:true});
+//         });
+//     }); 
+// });
+
+
+// $(document).ready(function (){  
+//   for(var i=0 ; i< m.length ; i++) {
+//     $('<div class="item"><img src="'+m[i]+'"><div class="carousel-caption"></div>   </div>').appendTo('.carousel-inner');
+//     $('<li data-target="#carousel-example-generic" data-slide-to="'+i+'"></li>').appendTo('.carousel-indicators')
+
+//   }
+//   $('.item').first().addClass('active');
+//   $('.carousel-indicators > li').first().addClass('active');
+//   $('#carousel_{{review.id}}').carousel("pause");
+// });
+
+
+
+
+</script>
+
+<script type="text/javascript">
+      $('#wish').click(function(){
+        var pk = $(this).attr('name')
+        $.ajax({
+          type: "POST",
+          url: "{% url 'timetable:wish' data.id %}",
+          data: {'pk':pk, 'csrfmiddlewaretoken':'{{csrf_token}}'},
+          dataType: 'json',
+          
+          success: function(data_wish){
+            $('#wish_count').text(data_wish.wishes_count)
+            
+            if(   $('#heart').hasClass('fas')    ){
+              $('#heart').removeClass('fas').addClass('far')
+            }
+            else{
+              $('#heart').removeClass('far').addClass('fas')
+            }
+          },
+          error: function(){
+            
+          }
+          
+        })
+      })
+      
+    </script>
+
+
+
+
+
+
+
+{%endblock%}

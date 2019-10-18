@@ -1,0 +1,59 @@
+{%extends 'base.html'%}
+{% load bootstrap3 %}
+{%block body%}
+
+
+<div class="container">
+    
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {% bootstrap_form form %}
+    {{ images_form }}
+    {{ image_formset.as_p }}
+    
+    <div id="rateYo"></div>
+    <input type="submit" class="btn btn-primary" value="작성"/>
+
+</form>
+
+</div>
+
+
+
+<script type="text/javascript">
+/* javascript */
+ 
+$(function() {
+ 
+  var $rateYo = $("#rateYo").rateYo(
+      {
+          "rating": 2.5,
+          "halfStar": true,
+          "multiColor": {
+              "startColor": "#f1c40f", 
+              "endColor"  : "#FF8C00"
+          },
+          onInit: function (rating, rateYoInstance) {
+              console.log("RateYo initialized! with " + rating);
+              $("#id_rate").attr("value",rating);
+          }
+      });
+    
+    
+    /* set the option `onChange` */
+    $rateYo.rateYo("option", "onSet", function () {
+     
+        /* get the rated fill at the current point of time */
+        var rating = $rateYo.rateYo("option", "rating");
+        console.log("The score of rating is " + rating);
+        
+        $("#id_rate").attr("value",rating);
+     
+    });
+});
+
+</script>
+
+
+{%endblock%}
+

@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{%block body%}
+<div class="container">
+    <div class="row">
+<div class="panel panel-default">
+                        <div class="panel-heading">
+            <div align="center">
+            {% if user_profile.image_profile %}
+                        <div align="center"> <img alt="User Pic" src="{{user_profile.image_profile.url}}" id="profile-image1"
+                                class="img-circle img-responsive">
+                            {% else %}
+                            <div align="center"> <img alt="User Pic" src="#" id="profile-image1" class="img-circle img-responsive">
+                                {% endif %}
+                            </div>
+<form method="post" enctype="multipart/form-data">
+    {%csrf_token%}
+    {{form.as_p}}
+    <input class="btn btn-primary" type="submit" value="전송">
+</form>
+</div>
+</div>
+</div>
+</div>
+</div>
+{%endblock%}

@@ -1,0 +1,368 @@
+{% extends 'base.html' %}
+{%load staticfiles%}
+
+{%block body%}
+
+<!--<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">-->
+<!--<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>-->
+<!--<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>-->
+<!--좌측 화면-->
+{% if user.is_authenticated %}
+<!------ Include the above in your HEAD tag ---------->
+<div class="container">
+    <div class="row">
+        <div class="hidden-sm affix profile">
+            <div class="panel panel-default">
+                <div class="box box-info">
+                    <div class="box-body">
+                        {% if user_profile.image_profile %}
+                        <div align="center"> <img alt="User Pic" src="{{user_profile.image_profile.url}}" id="profile-image1"
+                                class="img-circle img-responsive"></div>
+                        {% else %}
+                        <div align="center"> <img alt="User Pic" src="#" id="profile-image1" class="img-circle img-responsive"></div>
+                        {% endif %}
+                        <div align="center">
+                            <h4 style="color:#00b1b1;">{{user.username}}</h4></span>
+                        </div>
+                        <div class="clearfix"></div>
+                        <hr style="margin:5px 0 5px 0;">
+                        <div align="center">
+                            <div id="list-example" class="list-group">
+                                <a class="list-group-item list-group-item-action" href="#list-item-1">사용자정보</a>
+                                <a class="list-group-item list-group-item-action" href="#list-item-2">담은 일정</a>
+                                <a class="list-group-item list-group-item-action" href="#list-item-3">리뷰</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-offset-2 col-md-10 col-sm-12">
+            <div data-spy="scroll" data-target="#list-example" data-offset="0" class="scrollspy-example">
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 id="list-item-1">사용자 정보</h4>
+                    </div>
+                    <div class="panel-body">
+                        <div class="box box-info">
+                            <div class="box-body">
+                                <div class="col-sm-6">
+                                    {% if user_profile.image_profile %}
+                                    <div align="center"> <img alt="User Pic" src="{{user_profile.image_profile.url}}"
+                                            id="profile-image1" class="img-circle img-responsive"></div>
+                                    {% else %}
+                                    <div align="center"> <img alt="User Pic" src="#" id="profile-image1" class="img-circle img-responsive"></div>
+                                    {% endif %}
+                                    <!--<input id="profile-image-upload" class="hidden" type="file">-->
+                                    <!--<div style="color:#999;" >click here to change profile image</div>-->
+                                    <!--Upload Image Js And Css-->
+                                    <br>
+                                    <!-- /input-group -->
+                                </div>
+                                <div class="col-sm-6">
+                                    <h4 style="color:#00b1b1;">{{user.username}} </h4></span>
+                                    <span>
+                                        {% if user_profile.image_profile %}
+                                        <p>{{user_profile.content|linebreaks}}</p>
+                                        {% else %}
+                                        <p>사용자 정보를 입력해주세요</p>
+                                        {% endif %}
+                                    </span>
+
+                                    {% if user_profile.image_profile %}
+                                    <p><a class="btn btn-primary" href="{% url 'user_profile:update' user_profile.pk %}"
+                                            role="button">수정</a>
+                                        <a class="btn btn-primary" href="{% url 'user_profile:delete' user_profile.pk %}"
+                                            role="button">삭제</a></p>
+                                    {% else %}
+                                    <p><a class="btn btn-primary" href="{% url 'user_profile:create' %}" role="button">입력</a></p>
+                                    {% endif %}
+                                </div>
+                                <div class="clearfix"></div>
+                                <hr style="margin:5px 0 5px 0;">
+
+                                <div class="col-sm-5 col-xs-6 tital ">나이:</div>
+                                <div class="col-sm-7 col-xs-6 ">{{user_profile.age}}</div>
+                                <div class="clearfix"></div>
+                                <div class="bot-border"></div>
+
+                                <div class="col-sm-5 col-xs-6 tital ">성별:</div>
+                                <div class="col-sm-7"> {{user_profile.gender}}</div>
+                                <div class="clearfix"></div>
+                                <div class="bot-border"></div>
+
+                                <div class="col-sm-5 col-xs-6 tital "></div>
+                                <div class="col-sm-7"></div>
+                                <div class="clearfix"></div>
+                                <div class="bot-border"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 id="list-item-2">담은 일정</h4>
+                    </div>
+                    <div class="panel-body">
+                        <div class="box box-info">
+                            <div class="box-body">
+                                
+                                <section id="explore" class="explore" style="padding:0">
+                                    <div class="container">
+                                        <div class="row">
+                                        	<div class="col-sm-9">
+                                            <div class="section-header">
+                                            </div>
+                                            <div class="explore-content">
+                                                <div class="row">
+    
+                                                    {%for data in list_exams%}
+    
+                                                    <div class=" col-md-4 col-sm-6">
+                                                        <div class="single-explore-item">
+                                                            <div class="single-explore-img">
+                                                                {% if data.imageSrc %}
+                                                                <img src="{{data.imageSrc}}" alt="explore image" class="explore-img">
+                                                                {% else %}
+                                                                <img src="https://previews.123rf.com/images/aquir/aquir1405/aquir140500246/28667314-binnenkort-rood-round-grungy-stempel-ge%C3%AFsoleerd-op-een-witte-achtergrond.jpg"
+                                                                    alt="explore image" class="explore-img">
+                                                                {% endif %}
+                                                                <div class="single-explore-img-info">
+                                                                    <button>best rated</button>
+                                                                    <div class="single-explore-image-icon-box">
+                                                                        <ul>
+                                                                            <li>
+                                                                                <div class="single-explore-image-icon">
+                                                                                    <i class="fa fa-arrows-alt"></i>
+                                                                                </div>
+                                                                            </li>
+                                                                            <li>
+                                                                                <div class="single-explore-image-icon">
+                                                                                    <i class="fa fa-bookmark-o"></i>
+                                                                                </div>
+                                                                            </li>
+                                                                        </ul>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="single-explore-txt bg-theme-1">
+                                                                <h2><a href="{% url 'data:detail' data.id %}">{{data.name}}</a></h2>
+                                                                <p class="explore-rating-price">
+                                                                    <span class="explore-rating">5.0</span>
+                                                                    <a href="#"> 10 ratings</a>
+                                                                    <span class="explore-price-box">
+                                                                        form
+                                                                        <span class="explore-price">{{data.commonAddr}}</span>
+                                                                    </span>
+                                                                    <div class="explore-person">
+                                                                        <div class="row">
+                                                                            <div class="col-sm-2">
+                                                                                <div class="explore-person-img">
+                                                                                    <!--<a href="#">-->
+                                                                                    <!--    <img src="{% static '/images/explore/person.png' %}"-->
+                                                                                    <!--        alt="explore person">-->
+                                                                                    <!--</a>-->
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-sm-10" style="height:100px;overflow: hidden;">
+                                                                                <p>{{data.desc}}</p>
+                                                                                <p>{{data.tags}}</p>
+                                                                                <p>{{data.options}}</p>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+    
+    
+                                                    <!--<p>{{data.name}}</p>-->
+                                                    {%endfor%}
+    
+    
+    
+                                                </div>
+                                            </div>
+                                        </div>
+                                        </div>
+                                    </div>
+                                </section>
+
+
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!--리뷰-->
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 id="list-item-3">리뷰</h4>
+                    </div>
+                    <div class="panel-body">
+                        <div class="box box-info">
+                            <div class="box-body">
+                                
+                                <section id="explore" class="explore" style="padding:0">
+                                    <div class="container">
+                                        <div class="row">
+                                        	<div class="col-sm-9">
+                                            <div class="section-header">
+                                            </div>
+                                            <div class="explore-content">
+                                                <div class="row">
+    
+                                                    {% for review in review_list %}
+                                                        <div class=" col-md-4 col-sm-6">
+                                    						<div class="single-explore-item">
+                                    							<div class="single-explore-img" data-toggle="modal" data-target="#myModal_{{review.id}}" style="cursor:pointer;">
+                                    								{% if review.image_set.first %}
+                                    									<img src="/media/{{ review.image_set.first.image }}" alt="explore image" class="explore-img">
+                                    								{% else %}
+                                    									<img src="https://previews.123rf.com/images/aquir/aquir1405/aquir140500246/28667314-binnenkort-rood-round-grungy-stempel-ge%C3%AFsoleerd-op-een-witte-achtergrond.jpg" class="explore-img">
+                                    								{% endif %}
+                                    									<div class="single-explore-img-info">
+                                    										<button onclick="window.location.href='#'">best rated
+                                    										</button>
+                                    											<div class="single-explore-image-icon-box">
+                                    												<ul>
+                                    													<li>
+                                    														<div class="single-explore-image-icon">
+                                    															<i class="fa fa-arrows-alt"></i>
+                                    														</div>
+                                    													</li>
+                                    													<li>
+                                    														<div class="single-explore-image-icon">
+                                    															<i class="fa fa-bookmark-o"></i>
+                                    														</div>
+                                    													</li>
+                                    												</ul>
+                                    											</div>
+                                    									</div>
+                                    							</div>
+                                    							<div class="single-explore-txt bg-theme-1">
+                                    								<h2><a href="{% url 'data:detail' review.data.id %}">{{review.data.name}}</a></h2>
+                                    								<p class="explore-rating-price">
+                                    								<span class="explore-rating">{{review.rate}}</span>
+                                    								<a href="#"> 10 ratings</a> 
+                                    								<span class="explore-price-box">
+                                    									<!--form-->
+                                    									<span class="explore-price">{{review.user}}</span>
+                                    								</span>
+                                    								<div class="explore-person">
+                                    									<div class="row">
+                                    										<div class="col-sm-2">
+                                    											<div class="explore-person-img">
+                                    												<a href="#">
+                                    												{% if review.user.user_profile.image_profile %}
+                                    													<img src="{{review.user.user_profile.image_profile.url}}" alt="explore person" class="img-circle img-responsive">
+                                    												{% else %}
+                                    													<img src="{% static '/images/explore/person.png' %}" alt="explore person">
+                                    												{% endif %}
+                                    												</a>
+                                    											</div>
+                                    										</div>
+                                    										<div class="col-sm-10" style="height:100px;overflow: hidden;">
+                                    											{{review.content|truncatechars:150}}
+                                    										</div>
+                                    									</div>
+                                    								</div>
+                                    							</div>
+                                    								<!-- Button trigger modal -->
+                                    								<!--<button class="btn btn-primary" data-toggle="modal" data-target="#myModal_{{review.id}}">-->
+                                    								<!--	  Launch demo modal-->
+                                    								<!--</button>-->
+                                    									<!-- Modal -->
+                                    									<div class="modal fade bs-example-modal-lg" id="myModal_{{review.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                    										<div class="modal-dialog modal-lg">
+                                    									    	<div class="modal-content">
+                                    									      		<div class="modal-header">
+                                    									        		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                    									      				  <h4 class="modal-title" id="myModalLabel">
+                                    									      				  		<img src="{{review.user.user_profile.image_profile.url}}" alt="explore person" class="img-circle" width="40px" style="margin-right: 12px;">{{review.user}}
+                                    									      				  </h4>
+                                    									      		</div>
+                                    									      		<div class="modal-body">
+                                    										    		<div class="row">
+                                              												<div class="col-sm-12">
+                                              													<div class="row">
+                                                  													<div class="col-8 col-sm-8">	
+                                    										    						<div id="carousel_{{review.id}}" class="carousel slide" data-ride="carousel" data-interval="false">
+                                    																	 	<!-- Indicators -->
+                                    																	 	<ol class="carousel-indicators">
+                                    																	 		{% for i in review.image_set.all %}
+                                    																	      		{% if forloop.counter0 == 0 %}
+                                    																	    	<li data-target="#carousel_{{review.id}}" data-slide-to="{{ forloop.counter0 }}" class="active"></li>
+                                    																		  		{% else %}
+                                    																			<li data-target="#carousel_{{review.id}}" data-slide-to="{{ forloop.counter0 }}"></li>
+                                    																		  		{% endif %}
+                                    																	  		{% endfor %}
+                                    																	  	</ol>
+                                    
+                                    																	  <!-- Wrapper for slides -->
+                                    																	  	<div class="carousel-inner" role="listbox">
+                                    																	  		{% if review.image_set.first.image %}
+                                    																		  		{% for image in review.image_set.all %}
+                                    																		  			{% if forloop.counter == 1 %}
+                                    																	  					<div class="item active">
+                                    															  						{% else %}
+                                    								  									  						<div class="item">
+                                    															  						{% endif %}
+                                    																		  		<img src="{{image.image.url}}">
+                                    																		 					</div>
+                                    																		  		{% endfor %}
+                                    																		  	{% else %}
+                                    																		  		<img src="https://previews.123rf.com/images/aquir/aquir1405/aquir140500246/28667314-binnenkort-rood-round-grungy-stempel-ge%C3%AFsoleerd-op-een-witte-achtergrond.jpg">
+                                    																		  	{% endif %}	
+                                    																	  				</div>
+                                    																		  <!-- Controls -->
+                                    																		  	<a class="left carousel-control" href="#carousel_{{review.id}}" data-slide="prev">
+                                    																		    <span class="glyphicon glyphicon-chevron-left"></span>
+                                    																		  	</a>
+                                    																		  	<a class="right carousel-control" href="#carousel_{{review.id}}" data-slide="next">
+                                    																		    <span class="glyphicon glyphicon-chevron-right"></span>
+                                    																		  	</a>
+                                    																		</div>
+                                    																		
+                                    																	</div>
+                                    								          							<div class="col-8 col-sm-4">
+                                    								        								{{review.content|linebreaks }}
+                                    				                  									</div>
+                                    																</div>
+                                    															</div>
+                                    														</div>
+                                    									     				<div class="modal-footer">
+                                    												        <!--<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>-->
+                                    												        <!--<button type="button" class="btn btn-primary">Save changes</button>-->
+                                    								      					</div>
+                                    								    				</div>
+                                    								    			</div>
+                                    							    			</div><!-- /.modal-content -->
+                                    								  		</div><!-- /.modal-dialog -->
+                                    									</div><!-- /.modal -->
+                                    								</div>
+                                                                    {%endfor%}
+                                                    
+    
+    
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    </div>
+                                                </div>
+                                            </section>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{%endblock%}

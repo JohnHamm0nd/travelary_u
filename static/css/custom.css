@@ -1,0 +1,28 @@
+a.btn.btn-lg:hover,
+a.btn.btn-lg:focus {
+    padding: 10px 16px;
+    font-size: 18px;
+    font-weight: 400;
+}
+
+a.btn:hover,
+a.btn:focus {
+    padding: 6px 12px;
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.list-group > a:hover,
+.list-group > a:focus {
+    padding: 10px 15px;
+}
+
+.profile {
+    width: 180px;
+}
+
+@media screen and (max-width: 1199px) {
+    .profile {
+        width: 150px;
+    }
+}
