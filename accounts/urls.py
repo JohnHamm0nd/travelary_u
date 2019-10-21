@@ -9,7 +9,3 @@ urlpatterns = [
     path('signout/', auth_views.LogoutView.as_view(), name="signout"),
     #path('profile/', name="profile"),
 ]
-
-"""
-test
-"""

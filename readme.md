@@ -202,7 +202,25 @@ signin: 임포트한 라이브러리 auth_views.LoginView.as_view() 메소드를
 
 signout: 임포트한 라이브러리 auth_views.LogoutView.as_view() 메서드 호출하여 처리.
 
-앱(, data, review, user_profile)
+
+
+##### data
+
+list - 트레블러리 메인페이지, 데이터 리스트 페이지에서 검색 할 때 ( 값은 자바스크립트에서 긁어와서 views.py 에 주는데, 어떻게 주는지 모르겠다. 회원가입 시에도 그렇고 어떤 입력이 있는 페이지에서 입력 후 버튼 등을 누르면 그 값을 urls -> views 에 넘겨 주어야 하는데 템플릿에는 그런게 안보이고 어디있는 건지 안보인다.... )
+
+get_context_data 함수 사용 떄문인지
+
+장고에서 template_name 속성을 지정하지 않으면 장고는 템플릿을 유추해서 사용한다고 한다. 그래서 템플릿 지정 없이도 동작하는 것 같다. 
+
+detail - 지점 클릭시 지점의 id(pk)값을 넣어 views.py의 DataDetail.as_view() 함수 호출
+
+reviewcreate
+
+reviewlist
+
+
+
+앱(, data, user_profile)
 
 
 
@@ -213,6 +231,8 @@ signout: 임포트한 라이브러리 auth_views.LogoutView.as_view() 메서드 
 ##### 트레블러리
 
 django.views.generic 에 있는 TemplateView 를 임포트, 상속받아 메인페이지 사용(사용된 템플릿은 index.html)
+
+
 
 ##### accounts
 
@@ -228,7 +248,59 @@ reverse_lazy사용( 정확히 무슨역할이었지? )
 
 
 
-앱(, data, review, user_profile)
+##### data
+
+DataList - ListView 클래스를 상속받아 사용, urls.py 에서 넘어오면? ( 여기서 넘어오는 것으로 보임.. ) 
+
+model 로 Data( data 앱의 Data 클래스 ) 사용 
+
+paginate_by - 한 페이지에 30개씩
+
+get_context_data ?? 정확하게 무슨역할?
+
+self.request.Get.get 을 사용하여 자바스크립트로 긁어온 name과 location 변수를 얻어와 Data 모델에 쿼리
+
+모델명.objects.all() 은 모든  데이터를 가져오는것
+
+모델명.objects.filter() 는 조건 검색
+
+Q 는 쿼리를 날리는 명령 name__contains=self.request.GET['name'] 은 모델 안의 name 속성에서 self.request.GET 한 'name' 변수가 포함된 (완전일치가 아니라 포함, 완전일치일 경우 name=self.request.GET['name']) 데이터를 가져온다.
+
+& 는 and 연산자, | 는 or 연산자.
+
+list_exam.order_by('-totalReviewCount') 에서 order_by 는 데이터의 변수 'totalReviewCount' 를 기준으로 정렬, - 는 내림차순 정렬.
+
+self.request.GET.get('menu', False) == '1':
+
+self.request.GET.get('menu', False) == '2':
+
+self.request.GET.get('menu', False) == '19': 
+
+가 있는 것은 트레블러리 메인 페이지에서 검색 아래에 있는 레스토랑, 카페, 호텔 클릭시 검색
+
+그 밑 else 문은 아무것도 입력하지 않고 검색 했을 시 모든 데이터.
+
+여기서도 의문점??? urls.py -> views.py -> 리턴 하는데 data_detail.html 템플릿을 읽어오는 코드가 안보인다. 어디서 이 일을 하고 있는가? 
+
+-> urls.py 에 적어두었다.
+
+context['list_exams'] = file_exams 에서 은 paginate 30개씩 한 결과물이고 context['list_exams'] 은 data_detail.html 에 있는  {%for data in list_exams%} 에 데이터를 넣는 코드
+
+그 후 context 를 리턴.
+
+DataDetail - DetailView 클래스 상속
+
+model 로 Data 클래스 사용
+
+다른 함수나 리턴 없이 작동하는 것으로 보면 삭속받은 DetailView 클래스 에서 data_detail.html 알아서 잘 가져와 사용하는듯....
+
+ReviewCreate
+
+ReviewList
+
+
+
+앱(, data, user_profile)
 
 
 
@@ -252,9 +324,9 @@ views.py에 success_url = reverse_lazy('accounts:signin') 과 연관되어 있�
 
 {% bootstrap_form form %} 에 담겨서 전달하나?
 
-tttttt32sfsafd
 
-앱(, data, review, user_profile)
+
+앱(, data, user_profile)
 
 
 
