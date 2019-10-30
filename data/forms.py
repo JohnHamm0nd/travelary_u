@@ -14,6 +14,7 @@ class ReviewForm(forms.ModelForm):
         
 
 # model 에서 이미지 클래스를 보면 이미지 처리가 있는데 여기서도 해야 하나? -> 없어도 된다.
+# 둘 중에 하나만 해도 되는 것이면 어디서 하는게 더 좋은가?
 class ImageForm(forms.ModelForm):
 
 #    image = ProcessedImageField(

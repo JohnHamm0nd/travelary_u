@@ -1,7 +1,5 @@
 # Django - Travelary
 
-
-
 ## - templates
 
 ```python
@@ -20,7 +18,7 @@
 
 ```python
 STATICFILES_FINDERS =(
-    'django.contrib.staticfiles.finders.FileSystemFinder'`
+    'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 )
 ```
@@ -120,6 +118,8 @@ providers_media_js
 
 #### user_profile
 
+
+장고에서　pk　값을　지정하지　않을　경우　별도로　id　값을　만들어　pk로　지정한다．
 models 의 model 을 상속받아 사용. ( content, age, gender 필드 )
 
 django.contrib.auth.models 의 User모델을 유저모델로 사용.
@@ -212,17 +212,17 @@ get_context_data 함수 사용 떄문인지
 
 장고에서 template_name 속성을 지정하지 않으면 장고는 템플릿을 유추해서 사용한다고 한다. 그래서 템플릿 지정 없이도 동작하는 것 같다. 
 
-detail - 지점 클릭시 지점의 id(pk)값을 넣어 views.py의 DataDetail.as_view() 함수 호출
+detail - 지점 클릭시 지점의 id(pk)값을 넣어 views.py의 DataDetail.as_view() 함수 호출 ( DataDetail 클래스 안의 as_view()함수 - 상속받은 DetailView 안에 있음. )
 
-reviewcreate
+reviewcreate - 지점id/reviewcreate/유저id url 로 views.py의 ReviewCreate.as_view() 함수 호출 ( ReviewCreate 클래스 안의 as_view()함수 - 상속받은 CreateView 클래스 안에 있음. ) 상속받은 다른 클래스 LoginRequiredMixin 은 로그인 여부에 사용하는듯?
 
-reviewlist
+reviewlist - views.py의　ReviewList클래스의　as_view()함수　호출．
 
-
-
-앱(, data, user_profile)
-
-
+##### user_profile
+base - views.py의　ProfileList클래스의　as_view()　호출
+create - create/ url로　views.py의　ProfileCreate클래스의　as_view()　호출
+update - update/id url로　views.py의　ProfileUpdate클래스의　as_view()　호출
+delete - delete/id url로　views.py의　ProfileDelete클래스의　as_view()　호출
 
 
 
@@ -294,14 +294,28 @@ model 로 Data 클래스 사용
 
 다른 함수나 리턴 없이 작동하는 것으로 보면 삭속받은 DetailView 클래스 에서 data_detail.html 알아서 잘 가져와 사용하는듯....
 
-ReviewCreate
+ReviewCreate - LoginRequiredMixin, CreateView 클래스 상속받아 사용
+모델 - models.py의 Review사용
+폼플래스 - forms.py 의 ReviewForm사용
 
-ReviewList
+ReviewList - Listview　상속받아　사용
+모델 - models.py의　Review사용
 
+##### user_profile
 
+ProfileList - LoginRequiredMixin, ListView상속
+LoginRequiredMixin　－　로그인　여부
+model - Timetable 모델　사용
+template_name = 'user_profile/user_profile_list.html'　으로　템플릿　지정．
+다행히　여기　클래스에서는　view에서　템플릿을　지정해줬다（안헷갈린다）
+ProfileCreate - LoginRequiredMixin, CreateView상속
+model - User_Profile모델　사용（User_Profile 앱에있는　모델）
+forms.py가　없는데　여기서　처리하는건가？
 
-앱(, data, user_profile)
-
+ProfileUpdate - LoginRequiredMixin, UpdateView상속
+model - User_Profile모델　사용
+ProfileDelete - LoginRequiredMixin, DeleteView상속
+success_url = reverse_lazy('user_profile:base')　－＞　reverse_lazy 알아보자
 
 
 ## - forms
@@ -324,11 +338,19 @@ views.py에 success_url = reverse_lazy('accounts:signin') 과 연관되어 있�
 
 {% bootstrap_form form %} 에 담겨서 전달하나?
 
+##### data
+
+ReviewForm
+
+ImageForm
 
 
-앱(, data, user_profile)
 
 
+
+앱(, data, )
+
+user_profile　－＞　forms.py가　없다？？？
 
 
 
@@ -360,3 +382,24 @@ USE_TZ = False
 
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 200000
 DATA_UPLOAD_MAX_MEMORY_SIZE = 52428800
+
+##
+##
+##
+
+# 지금　헷갈리는것
+urls.py 에서　views.py로　넘기는　인자가　없는데　어떻게　동작하고　있는거지？
+views.py에서는　함수들　선언　후　호출하는　작업이　없는에　어떻게　함수들이　동작하고　있는거？
+
+
+내가　이해하고있는　장고　mvc　작업은　이건데　url에서　템플릿　지정이　없고，　넘겨주는　인자도　없고
+view 에서　함수　선언만　있고　호출작업이　없는데　어떻게　작업해서　리턴하는건지　모르겠다．
+
+|url|view|model|
+|---:|---:|---:|
+|요청(인자)　->|SQL(인자)(장고에서는 request로　사용)->|받은　인자로　데이터　검색，수정，입력　등　작업|
+|템플릿지정，해당　url로　템플릿　받음|템플릿＋데이터　리턴|＜－데이터　등　결과물　리턴|
+
+userprofile　앱은　forms.py도　없는데？　
+view.py 에　있는　create, update 는　상속받은　CreateView，UpdateView　에　fields　변수에　필드값　지정하여　바로　처리　하는듯..
+그래도　헷갈리는건　data나　accounts에　forms.py 보면　상속받을떄도　ModelForm，UserCreationForm　같은　폼을　상속받는데.... 얘는　왜？？？
