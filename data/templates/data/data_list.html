@@ -78,8 +78,8 @@
 							<div class="single-explore-txt bg-theme-1">
 								<h2><a href="{% url 'data:detail' data.id %}">{{data.name}}</a></h2>
 								<p class="explore-rating-price">
-									<span class="explore-rating">5.0</span>
-									<a href="#"> 10 ratings</a> 
+									<span class="explore-rating">{{data.average_review_score}}</span>
+									<a href="#"> {{data.review_count}} ratings</a> 
 									<span class="explore-price-box">
 										form
 										<span class="explore-price">{{data.commonAddr}}</span>

@@ -27,26 +27,26 @@ class DataList(ListView):
         if self.request.GET.get('name', False):
             if self.request.GET.get('location', False):
                 list_exam = Data.objects.filter(Q(name__contains=self.request.GET['name']) & (Q(commonAddr__contains=self.request.GET['location'])|Q(addr__contains=self.request.GET['location'])))
-                list_exam = list_exam.order_by('-totalReviewCount')
+                list_exam = list_exam.order_by('-review_count')
             else:
                 list_exam = Data.objects.filter(name__contains=self.request.GET['name'])
-                list_exam.order_by('-totalReviewCount')
+                list_exam.order_by('-review_count')
 
         elif self.request.GET.get('location', False):
             list_exam = Data.objects.filter(Q(commonAddr__contains=self.request.GET['location'])|Q(addr__contains=self.request.GET['location']))
-            list_exam = list_exam.order_by('-totalReviewCount')
+            list_exam = list_exam.order_by('-review_count')
         elif self.request.GET.get('menu', False) == '1':
             list_exam = Data.objects.filter(menu__in=[1,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17])
-            list_exam = list_exam.order_by('-totalReviewCount')
+            list_exam = list_exam.order_by('-review_count')
         elif self.request.GET.get('menu', False) == '2':
             list_exam = Data.objects.filter(menu__in=[2])
-            list_exam = list_exam.order_by('-totalReviewCount')
+            list_exam = list_exam.order_by('-review_count')
         elif self.request.GET.get('menu', False) == '19':
             list_exam = Data.objects.filter(menu__in=[19])
-            list_exam = list_exam.order_by('-totalReviewCount')
+            list_exam = list_exam.order_by('-review_count')
         else:
             list_exam = Data.objects.all()
-            list_exam = list_exam.order_by('-totalReviewCount')
+            list_exam = list_exam.order_by('-review_count')
 
         paginator = Paginator(list_exam, self.paginate_by)
         page = self.request.GET.get('page')
