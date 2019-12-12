@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.views.generic import ListView, CreateView, DetailView
+from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView
 from .models import Data, Review, Image
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db.models import Q
@@ -86,6 +86,34 @@ class ReviewCreate(LoginRequiredMixin, CreateView):
                 image_formset.save()
 
         return super().form_valid(form)
+        
+
+class ReviewUpdate(LoginRequiredMixin, UpdateView):
+    model = Review
+    form_class = ReviewForm
+    # fields = ['image', 'content', 'rate']
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['image_formset'] = ImageFormSet()
+        return context
+
+    def form_valid(self, form):
+        image_formset = ImageFormSet(self.request.POST, self.request.FILES)
+
+        with transaction.atomic():
+            form.instance.user = self.request.user
+            form.instance.data_id = self.kwargs.get('data_id')
+            self.object = form.save()
+
+            if image_formset.is_valid():
+                image_formset.instance = self.object
+                image_formset.save()
+
+        return super().form_valid(form)
+
+class ReviewDelete(LoginRequiredMixin, DeleteView):
+    model = Review
 
 class ReviewList(ListView):
     model = Review
