@@ -151,8 +151,8 @@
 								    </span>
 								    <!-- user와 review.user가 같은지 체크해서 같으면 수정, 삭제 버튼 표시 -->
 								    {% if user == review.user %}
-									<a href="{% url 'data:reviewdelete' data_id=data.id user_id=user.id %}" class="btn btn-primary" style="float:right;float:right;margin-right:5px">삭제</a>
-									<a href="{% url 'data:reviewupdate' data_id=data.id user_id=user.id %}" class="btn btn-primary" style="float:right;float:right;margin-right:5px">수정</a>
+									<a href="{% url 'data:reviewdelete' data_id=data.id user_id=user.id pk=review.id %}" class="btn btn-primary" style="float:right;float:right;margin-right:5px">삭제</a>
+									<a href="{% url 'data:reviewupdate' data_id=data.id user_id=user.id pk=review.id %}" class="btn btn-primary" style="float:right;float:right;margin-right:5px">수정</a>
 								    {% endif %}
 								</div>
 								<p style="padding: 10px"></p>

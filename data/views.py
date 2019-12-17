@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView
 from .models import Data, Review, Image
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
@@ -6,6 +6,10 @@ from django.db.models import Q
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .forms import ReviewForm, ImageForm, ImageFormSet
 from django.db import transaction
+from django.urls import reverse_lazy
+from django.http import HttpResponseRedirect
+from django.contrib import messages
+from django.urls import reverse
 
 # Create your views here.
 
@@ -114,7 +118,19 @@ class ReviewUpdate(LoginRequiredMixin, UpdateView):
 
 class ReviewDelete(LoginRequiredMixin, DeleteView):
     model = Review
-
+    template_name = 'data/review_delete.html'
+    
+    def get_success_url(self): # 요청에 성공하였을 때 보낼 url - 아직 정확하게 어떤 함수인지 감이 덜왔음.
+        return reverse('data:detail', kwargs={'pk': self.kwargs.get('data_id')})  # self에 kwargs에서 get을 사용하여 data_id를 가져와 data_id 디테일페이로 보냄.
+    
+    def dispatch(self, request, **kwargs): # 정확히 무슨 함수인지 모르겠다, 일단 템플릿 페이지에서 유저가 쓴 글이 아니면 수정, 삭제 버튼이 보이지 않게 하였지만, 이 함수에서 get_object의 유저와 request의 유저가 같은지 확인하여 진행한다.
+        object = self.get_object()
+        if object.user != request.user:
+            messages.warning(request, '삭제할 권한이 없습니다.')
+            return HttpResponseRedirect('/')
+        else:
+            return super(ReviewDelete, self).dispatch(request, **kwargs)
+    
 class ReviewList(ListView):
     model = Review
     paginate_by = 30

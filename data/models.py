@@ -26,9 +26,9 @@ class Data(models.Model):
     y = models.FloatField()
     imageSrc = models.CharField(max_length=300)
     # 리뷰점수(리뷰점수합, 카운트, 리뷰평균점수)
-    sum_review_score = models.FloatField(default=0)
-    review_count = models.IntegerField(default=0)
-    average_review_score = models.FloatField(default=0)
+    sum_review_score = models.FloatField(default=0, null=True)
+    review_count = models.IntegerField(default=0, null=True)
+    average_review_score = models.FloatField(default=0, null=True)
 
 def post_image_path(instance, filename):
     return 'reviews/{}/{}'.format(instance.review.pk, filename)
@@ -50,6 +50,18 @@ class Review(models.Model):
             Data.objects.filter(pk=self.data_id).update(sum_review_score=F('sum_review_score')+self.rate)
             Data.objects.filter(pk=self.data_id).update(average_review_score=Round(F('sum_review_score')/F('review_count'), 1))
         super().save(*args, **kwargs)
+    
+    # 리뷰 카운트, 리뷰점수, 평균점수 저장을 위해 form save 방법 변경. update 를 사용하여 Data 모델에 있는 필드 값 변경
+    def delete(self, *args, **kwargs):
+        Data.objects.filter(pk=self.data_id).update(review_count=F('review_count')-1)
+        Data.objects.filter(pk=self.data_id).update(sum_review_score=F('sum_review_score')-self.rate)
+        if Data.objects.get(pk=self.data_id).review_count == 0:
+            Data.objects.filter(pk=self.data_id).update(average_review_score=0)
+            Data.objects.filter(pk=self.data_id).update(sum_review_score=0)
+        else:
+            Data.objects.filter(pk=self.data_id).update(average_review_score=Round(F('sum_review_score')/F('review_count'), 1))
+        super().delete(*args, **kwargs)
+    
     
     class Meta:
         ordering = ['-created_at']
