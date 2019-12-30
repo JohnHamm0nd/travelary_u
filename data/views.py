@@ -99,11 +99,11 @@ class ReviewUpdate(LoginRequiredMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['image_formset'] = ImageFormSet()
+        context['image_formset'] = ImageFormSet(instance=self.object) # instance로 self.object를 가져와 기존에 있던 파일을 가져옮(하지만 삭제, 수정이 안된다..)
         return context
 
     def form_valid(self, form):
-        image_formset = ImageFormSet(self.request.POST, self.request.FILES)
+        image_formset = ImageFormSet(self.request.POST, self.request.FILES, instance=self.object) # instance=self.object 를 추가해야 수정이 된다.
 
         with transaction.atomic():
             form.instance.user = self.request.user
