@@ -44,10 +44,19 @@ class Review(models.Model):
         return reverse('data:detail', kwargs={'pk': self.data_id})
     
     # 리뷰 카운트, 리뷰점수, 평균점수 저장을 위해 form save 방법 변경. update 를 사용하여 Data 모델에 있는 필드 값 변경
+    # view에서 save함수를 두번 사용 하는 것을(사진이 있는 경우 form을 저장하고 image_formset을 저장) 수정해 사진이 있는 경우에도 한번에 저장하는 방법을 사용하려고 했으나 잘 안됨.
+    # 다른방법(데이터에 있는 리뷰점수에서 자신의 이전 리뷰 점수를 빼고 새로 들어오는 리뷰 점수를 더한다 - 리뷰 수정하는 것을 구현하면 해결은 되는데 save함수를 두번 호출한다=비효율적)
+    # 1. Date.sum_review_score에 review.rate(salf.rate)를 더함 -> 2. Date.sum_review_score에 review.rate(orm사용하여 Review db에서 가져온 rate)를 뺌
+    # 3. Date.sum_review_score에 review.rate(salf.rate)를 더함
+    # 리뷰를 새로 생성 할때에는 if, else문 - 수정 할 때에는 else문, else문 2번씩 실행하기 때문에 비효율적.(결과물에 이상은 없다)
     def save(self, *args, **kwargs):
         if not self.pk:
             Data.objects.filter(pk=self.data_id).update(review_count=F('review_count')+1)
             Data.objects.filter(pk=self.data_id).update(sum_review_score=F('sum_review_score')+self.rate)
+            Data.objects.filter(pk=self.data_id).update(average_review_score=Round(F('sum_review_score')/F('review_count'), 1))
+        else:
+            pre_rate = Review.objects.get(pk=self.pk).rate
+            Data.objects.filter(pk=self.data_id).update(sum_review_score=F('sum_review_score')-pre_rate+self.rate)
             Data.objects.filter(pk=self.data_id).update(average_review_score=Round(F('sum_review_score')/F('review_count'), 1))
         super().save(*args, **kwargs)
     

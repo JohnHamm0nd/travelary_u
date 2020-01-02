@@ -77,10 +77,26 @@ class ReviewCreate(LoginRequiredMixin, CreateView):
         context['image_formset'] = ImageFormSet()
         return context
 
+
+    # 문제 : 리뷰를 저장할때 폼을 저장하고 사진이 있으면 이미지 폼에 넣어 한번 더 저장하는데 model에서 save를 두번 하기 때문에(한번은 처음저장이라 pk가 없고 이미지폼 저장시에는 self.pk가 있음)
+    # 리뷰 점수가 두번 업데이트 되는 문제가 발생.
+    # model은 수정할 때 self.pk 여부에 따라서 작동해야 하므로 model은 유지하고 여기서 수정을 해야 할 것 같다.(한번에 저장하는 방법으로 변경)
     def form_valid(self, form):
         image_formset = ImageFormSet(self.request.POST, self.request.FILES)
 
         with transaction.atomic():
+            """
+            if image_formset.is_valid():            
+                form.instance.user = self.request.user
+                form.instance.data_id = self.kwargs.get('data_id')
+                self.object = form.save()
+                image_formset.instance = self.object
+                image_formset.save()
+            else :
+                form.instance.user = self.request.user
+                form.instance.data_id = self.kwargs.get('data_id')
+                self.object = form.save()
+            """
             form.instance.user = self.request.user
             form.instance.data_id = self.kwargs.get('data_id')
             self.object = form.save()
@@ -88,7 +104,7 @@ class ReviewCreate(LoginRequiredMixin, CreateView):
             if image_formset.is_valid():
                 image_formset.instance = self.object
                 image_formset.save()
-
+        
         return super().form_valid(form)
         
 
